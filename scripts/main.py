@@ -1,3 +1,4 @@
+from datastore import DataStore
 from utils.config import Config
 from gui import open_gui
 from python_app_utils.log import Logger
@@ -7,7 +8,7 @@ def main():
     Config()
     logger = Logger()
     logger.init(Config)
-
+    DataStore()
     open_gui()
 
 if __name__ == "__main__":

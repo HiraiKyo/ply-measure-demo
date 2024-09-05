@@ -1,27 +1,28 @@
+import os
 import sys
 from PyQt6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTextEdit, QSpacerItem, QSizePolicy
-from PyQt6.QtGui import QFont, QTextOption, QFontMetrics
+from PyQt6.QtGui import QFont, QTextOption, QFontMetrics, QPixmap
 from PyQt6.QtCore import Qt
 
-from datastore import DataStore
+from datastore import DataStore, MeasureResult
 from actions import on_click_auto, on_click_snapshot
-
+from python_app_utils.log import Logger
 
 FONT_SIZE = 16
+
+logger = Logger()
+datastore = DataStore()
 
 def open_gui():
   """
   Open Viewer by PyQt6
   """
-  # データストア初期化
-  DataStore()
-
   qAp = QApplication(sys.argv)
   viewer = MainWindow()
   viewer.show()
   qAp.exec()
 
-  return None
+  return
 
 class MainWindow(QMainWindow):
   def __init__(self):
@@ -80,27 +81,24 @@ class ValuesField(QWidget):
   def __init__(self):
     super().__init__()
 
-    # TODO: Reactive UI
-    datastore = DataStore()
-
     vbox = QVBoxLayout()
     self.setLayout(vbox)
 
     v1 = ValueFieldBoxLayout(
       "Cylinder Center",
-      ", ".join([f"{d:.2f}" for d in datastore.measure_result.center])
+      "center"
     )
     vbox.addLayout(v1)
 
     v2 = ValueFieldBoxLayout(
       "Cylinder Radius",
-      f"{datastore.measure_result.radius:.2f}"
+      "radius"
     )
     vbox.addLayout(v2)
 
     v3 = ValueFieldBoxLayout(
       "Distances from edges",
-      ", ".join([f"{d:.2f}" for d in datastore.measure_result.distances])
+      "distances"
     )
     vbox.addLayout(v3)
 
@@ -109,31 +107,72 @@ class ValuesField(QWidget):
     pass
 
 class ValueFieldBoxLayout(QHBoxLayout):
-  def __init__(self, label, value):
+  def __init__(self, label: str, key: str):
     super().__init__()
+    self.key = key
+
     qlabel = QLabel()
     qlabel.setText(label)
-
-    qtext = QTextEdit()
-    qtext.setReadOnly(True)
-    qtext.setText(value)
-    qtext.setFont(QFont("Yu Gothic UI", FONT_SIZE))
-    qtext.setMaximumHeight(QFontMetrics(qtext.font()).lineSpacing() + 10)
-    qtext.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    qtext.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    qtext.setWordWrapMode(QTextOption.WrapMode.NoWrap)
-    qtext.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
-    qtext.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
+    self.qtext = QTextEdit()
+    self.qtext.setReadOnly(True)
+    self.qtext.setFont(QFont("Yu Gothic UI", FONT_SIZE))
+    self.qtext.setMaximumHeight(QFontMetrics(self.qtext.font()).lineSpacing() + 10)
+    self.qtext.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    self.qtext.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+    self.qtext.setWordWrapMode(QTextOption.WrapMode.NoWrap)
+    self.qtext.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
+    self.qtext.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
 
     self.addWidget(qlabel)
-    self.addWidget(qtext)
+    self.addWidget(self.qtext)
     self.addItem(HorizontalSpacer())
 
+    datastore.measure_result_changed.connect(self.on_change)
+
+  def on_change(self, result: dict):
+    if self.key not in result:
+      self.qtext.setText("N/A")
+
+    value = result[self.key]
+    if isinstance(value, list):
+      self.qtext.setText(", ".join([f"{d:.2f}" for d in value]))
+    else:
+      self.qtext.setText(f"{value:.2f}")
+  
 class SnapshotField(QWidget):
   def __init__(self):
     super().__init__()
-    self.setStyleSheet("background-color: #ffff00;")
-    pass
+    self.setGeometry(0, 0, 640, 480)
+    # 画像を表示
+    if datastore.image_path is None:
+        pass
+    layout = QVBoxLayout()
+    self.setLayout(layout)
+
+    self.label = QLabel(self)
+    self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    self.label.setFixedSize(640, 480)
+    layout.addWidget(self.label)
+
+    datastore.image_path_changed.connect(self.load_image)
+
+  def load_image(self, image_path):
+    print(image_path)
+    if not os.path.exists(image_path):
+      print(f"Error: Image file not found at {image_path}")
+      return
+    pixmap = QPixmap(f"{image_path}")
+    if not pixmap.isNull():
+      scaled_pixmap = pixmap.scaled(
+        self.label.size(),
+        Qt.AspectRatioMode.KeepAspectRatio,
+        Qt.TransformationMode.SmoothTransformation
+      )
+      self.label.setPixmap(scaled_pixmap)
+      print(f"Pixmap set to label. Size: {scaled_pixmap.size()}")
+      # self.label.repaint()
+    else:
+      self.label.setText("File is missing or failed to load image.")
 
 class LogField(QWidget):
   def __init__(self):

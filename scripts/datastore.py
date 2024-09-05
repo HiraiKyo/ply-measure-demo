@@ -1,4 +1,4 @@
-from python_app_utils.singleton import Singleton
+from datetime import datetime
 from pydantic import BaseModel
 from typing import List
 import time
@@ -6,6 +6,8 @@ import os
 import io
 import csv
 from python_app_utils.log import Logger
+from PyQt6.QtCore import pyqtSignal, QObject
+
 class MeasureResult(BaseModel):
   center: List[float]
   radius: float
@@ -16,14 +18,55 @@ class MeasureResult(BaseModel):
 
 logger = Logger()
 
-class DataStore(Singleton):
-  running_state: bool = False
-  loop_mode: bool = False
-
-  measure_result: MeasureResult
+class DataStore(QObject):
   outdir: str
 
-  def __init__(self):
+  running_state_changed = pyqtSignal(bool)
+  @property
+  def running_state(self):
+    return self._running_state
+  @running_state.setter
+  def running_state(self, value):
+    if self._running_state != value:
+      self._running_state = value
+      self.running_state_changed.emit(value)
+
+  measure_result_changed = pyqtSignal(dict)
+  @property
+  def measure_result(self):
+    return self._measure_result
+  @measure_result.setter
+  def measure_result(self, value: MeasureResult):
+    self._measure_result = value
+    self.measure_result_changed.emit(value.model_dump())
+
+  image_path_changed = pyqtSignal(str)
+  @property
+  def image_path(self):
+    return self._image_path
+  @image_path.setter
+  def image_path(self, value):
+    self._image_path = value
+    self.image_path_changed.emit(value)
+
+  # Singletonパターン
+  _instance = None
+  _initialized = False
+  def __new__(cls):
+    if cls._instance is None:
+      cls._instance = super(DataStore, cls).__new__(cls)
+    return cls._instance
+
+  def __init__(self, *args, **kwargs):
+    # Singletonパターン記述
+    if self._initialized:
+      return
+    self._initialized = True
+
+    super(DataStore, self).__init__(*args, **kwargs)
+    self.uid = datetime.now().microsecond
+    self.outdir = None
+    self._running_state = False
     self.measure_result = MeasureResult(
       center=[0, 0, 1],
       radius=0.0,
@@ -32,6 +75,7 @@ class DataStore(Singleton):
       plane_indices=[0, 1, 2],
       line_segments_indices=[[0, 1],[1, 2]]
     )
+    self.image_path = None
     pass
 
   def update_measure_result(self, result: MeasureResult):
@@ -43,14 +87,13 @@ class DataStore(Singleton):
     writer = csv.DictWriter(output, fieldnames=fields)
     writer.writeheader()
     writer.writerow(result.model_dump())
-
-    logger.info("Update measure result")
     return
 
   def update_image(self, image_path: str):
     self.image_path = image_path
+    self.image_path_changed.emit(image_path)
     return
-  
+
 
   def start_run(self):
     self.running_state = True

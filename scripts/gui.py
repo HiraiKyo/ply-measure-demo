@@ -2,13 +2,9 @@ import sys
 from PyQt6.QtWidgets import QMainWindow, QApplication, QLabel, QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QTextEdit, QSpacerItem, QSizePolicy
 from PyQt6.QtGui import QFont, QTextOption, QFontMetrics
 from PyQt6.QtCore import Qt
-import numpy as np
-import open3d as o3d
 
 from datastore import DataStore
-from models.snapshot import take_snapshot
-from models.measure import measure
-from python_app_utils.log import Logger
+from actions import on_click_auto, on_click_snapshot
 
 
 FONT_SIZE = 16
@@ -76,23 +72,9 @@ class ActionField(QWidget):
     hbox.addWidget(buttonClose)
 
     # ボタンのコールバック登録
-    buttonAuto.clicked.connect(self.on_click_auto)
-    buttonSnapshot.clicked.connect(self.on_click_snapshot)
-    buttonClose.clicked.connect(self.close)
-
-  def on_click_auto(self):
-    # TODO: ループ撮影実装
-    pass
-
-  def on_click_snapshot(self):
-    try:
-      pcd = take_snapshot()
-      o3d.visualization.draw_geometries([pcd], window_name="Snapshot")
-      measure(np.asarray(pcd.points))
-    except Exception as e:
-      logger = Logger()
-      logger.error("Failed to take snapshot.", e)
-    pass
+    buttonAuto.clicked.connect(on_click_auto)
+    buttonSnapshot.clicked.connect(on_click_snapshot)
+    buttonClose.clicked.connect(QApplication.instance().quit)
 
 class ValuesField(QWidget):
   def __init__(self):

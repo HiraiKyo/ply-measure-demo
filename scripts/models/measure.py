@@ -1,4 +1,3 @@
-from pprint import pprint
 import open3d as o3d
 import numpy as np
 from numpy.typing import NDArray
@@ -24,7 +23,7 @@ def measure(points: NDArray[np.floating]):
     # エッジ検出
     plane_indices, plane_model = detect_plane(points, threshold=1.0)
     if plane_indices is None:
-        return
+        raise Exception("Failed to detect plane")
     indices, line_segments_indices, line_models = detect_line(points[plane_indices], plane_model)
 
     # エッジを可視化
@@ -45,7 +44,7 @@ def measure(points: NDArray[np.floating]):
     # クラスタリングを行う
     clusters = plane_clustering(tmp[plane_indices], eps = 10.0)
     if len(clusters) == 0:
-        return
+        raise Exception("Failed to detect cylinder top")
     points_cylinder_top = tmp[plane_indices][clusters[0]]
     # visualize(points_cylinder_top)
 
@@ -67,8 +66,4 @@ def measure(points: NDArray[np.floating]):
     for line_model in line_models:
         p, v = line_model
         distances.append(line_distance(center, normal, p, v))
-    # print("円筒中心: ", center)
-    # print("円筒半径: ", radius)
-    # # 配列をpretty print
-    # print("エッジと円筒軸の距離: ")
-    # pprint([f"{d:.2f}" for d in distances])
+    return center, radius, normal, distances, plane_indices, line_segments_indices

@@ -3,8 +3,6 @@ import numpy as np
 import time
 from python_app_utils.log import Logger
 
-IMAGE_NAME = "out.png"
-
 def generate_disk_mesh(center, radius, normal):
   # 円盤とエッジを描画
   mesh_disk = o3d.geometry.TriangleMesh.create_cylinder(radius=radius, height=3.0, resolution=50, split=1)
@@ -23,7 +21,7 @@ def generate_edge_line(points, plane_indices, line_segments_indices):
   line_set.lines = o3d.utility.Vector2iVector(line_segments_indices)
   return line_set
 
-def capture_image(pcds, outdir, cam_front, cam_lookat, cam_up, cam_zoom):
+def capture_image(pcds, outdir, filename, cam_front, cam_lookat, cam_up, cam_zoom):
     vis = o3d.visualization.Visualizer()
     vis.create_window(visible=False)
 
@@ -50,10 +48,10 @@ def capture_image(pcds, outdir, cam_front, cam_lookat, cam_up, cam_zoom):
     vis.poll_events()
     vis.update_renderer()
     time.sleep(1)
-    outpath = f"{outdir}/{IMAGE_NAME}"
+    outpath = f"{outdir}/{filename}"
     vis.capture_screen_image(outpath, do_render=True)
 
     logger = Logger()
-    logger.info(f"Captured snapshot: {outdir}/{IMAGE_NAME}")
+    logger.info(f"Captured snapshot: {outdir}/{filename}")
 
     return outpath

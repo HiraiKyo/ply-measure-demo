@@ -4,17 +4,19 @@ from models.measure import measure
 import numpy as np
 
 from models.visualize import generate_disk_mesh, generate_edge_line, capture_image
-from datastore import DataStore, MeasureResult
+from datastore import DataStore, MeasureResult, DistanceSet
 from utils.config import Config
 
 dataStore = DataStore()
+logger = Logger()
 
 def on_click_auto():
   # TODO: ループ実装
   pass
 
-def on_click_snapshot():
-  logger = Logger()
+# 別スレッドで処理を実行する
+def on_click_snapshot() -> bool:
+  
   try:
     # 開始前処理
     dataStore.start_run()
@@ -26,11 +28,17 @@ def on_click_snapshot():
     center, radius, normal, distances, plane_indices, line_segments_indices = measure(np.asarray(pcd.points))
 
     # Datastore層に結果を保存(->FlexパターンでGUI更新)
+    distanceSets = [DistanceSet(
+      distance=d,
+      line_segment_indices=line_segments_indices[i],
+      image_path=None
+    ) for i, d in enumerate(distances)]
+
     result = MeasureResult(
       center=center,
       radius=radius,
       normal=normal,
-      distances=distances,
+      distances=distanceSets,
       plane_indices=plane_indices,
       line_segments_indices=line_segments_indices
     )
@@ -43,14 +51,38 @@ def on_click_snapshot():
     outpath = capture_image(
       [pcd, disk, line_set],
       dataStore.outdir,
+      "overview.png",
       cam_front=Config.CAM_FRONT,
       cam_lookat=dataStore.measure_result.center,
       cam_up=[0, 0, 1],
       cam_zoom=Config.CAM_ZOOM
     )
     dataStore.update_image(outpath)
+
+    # 各距離用の画像生成
+    for i in range(len(distances)):
+      line_set = generate_edge_line(np.asarray(pcd.points), plane_indices, [line_segments_indices[i]])
+      outpath = capture_image(
+        [disk, line_set],
+        dataStore.outdir,
+        f"distance_{i}.png",
+        cam_front=Config.CAM_FRONT,
+        cam_lookat=dataStore.measure_result.center,
+        cam_up=[0, 0, 1],
+        cam_zoom=Config.CAM_ZOOM
+      )
+      updated_distanceSet = DistanceSet(
+        distance=result.distances[i].distance,
+        line_segment_indices=result.distances[i].line_segment_indices,
+        image_path=outpath
+      )
+      result.distances[i] = updated_distanceSet
+      dataStore.update_measure_result(result)
+
+    return True
   except Exception as e:
     logger.error(f"Failed to take snapshot. {e}")
+    return False
   finally:
     # 終了処理
     dataStore.finish_run()

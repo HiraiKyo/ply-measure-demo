@@ -8,11 +8,18 @@ import csv
 from python_app_utils.log import Logger
 from PyQt6.QtCore import pyqtSignal, QObject
 
+from typing import Union
+
+class DistanceSet(BaseModel):
+  distance: float
+  line_segment_indices: List[int]
+  image_path: Union[str, None]
+
 class MeasureResult(BaseModel):
   center: List[float]
   radius: float
   normal: List[float]
-  distances: List[float]
+  distances: List[DistanceSet]
   plane_indices: List[int]
   line_segments_indices: List[List[int]]
 
@@ -64,21 +71,15 @@ class DataStore(QObject):
     self._initialized = True
 
     super(DataStore, self).__init__(*args, **kwargs)
-    self.uid = datetime.now().microsecond
-    self.outdir = None
+    self._running_state = True
+    self.initialize_data()
     self._running_state = False
-    self.measure_result = MeasureResult(
-      center=[0, 0, 1],
-      radius=0.0,
-      normal=[0, 0, 1],
-      distances=[0, 0, 0],
-      plane_indices=[0, 1, 2],
-      line_segments_indices=[[0, 1],[1, 2]]
-    )
-    self.image_path = None
     pass
 
   def update_measure_result(self, result: MeasureResult):
+    # result validation
+    assert len(result.distances) == len(result.line_segments_indices)
+
     self.measure_result = result
     # PydanticからCSV保存
     fields = list(self.measure_result.model_fields.keys())
@@ -97,6 +98,10 @@ class DataStore(QObject):
 
   def start_run(self):
     self.running_state = True
+
+    # 計算開始時は明示的にデータストア初期化
+    self.initialize_data()
+
     # 開始時に出力先ディレクトリをtimestampから作成
     timestamp = time.strftime("%Y%m%d%H%M%S", time.localtime())
     self.outdir = f"out/{timestamp}"
@@ -107,3 +112,15 @@ class DataStore(QObject):
   def finish_run(self):
     self.running_state = False
     logger.export(self.outdir)
+
+  def initialize_data(self):
+    self.outdir = None
+    self.measure_result = MeasureResult(
+      center=[],
+      radius=0.0,
+      normal=[],
+      distances=[],
+      plane_indices=[],
+      line_segments_indices=[]
+    )
+    self.image_path = None

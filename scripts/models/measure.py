@@ -21,14 +21,14 @@ def line_distance(p0, v0, p1, v1):
 
 def measure(points: NDArray[np.floating]):
     # エッジ検出
-    plane_indices, plane_model = detect_plane(points, threshold=1.0)
-    if plane_indices is None:
+    base_plane_indices, base_plane_model = detect_plane(points, threshold=1.0)
+    if base_plane_indices is None:
         raise Exception("Failed to detect plane")
-    indices, line_segments_indices, line_models = detect_line(points[plane_indices], plane_model)
+    indices, line_segments_indices, line_models = detect_line(points[base_plane_indices], base_plane_model)
 
     # エッジを可視化
     line_set = o3d.geometry.LineSet()
-    line_set.points = o3d.utility.Vector3dVector(points[plane_indices])
+    line_set.points = o3d.utility.Vector3dVector(points[base_plane_indices])
     line_set.lines = o3d.utility.Vector2iVector(line_segments_indices)
     # o3d.visualization.draw_geometries([line_set], window_name="Detected Edge")
 
@@ -36,6 +36,7 @@ def measure(points: NDArray[np.floating]):
     # 円筒上面の点群を取得
     loops = 5
     tmp = points
+    plane_indices, plane_model = base_plane_indices, base_plane_model
     for i in range(loops):
         outlier_indices = np.setdiff1d(np.arange(len(tmp)), plane_indices)
         tmp = tmp[outlier_indices]
@@ -66,4 +67,4 @@ def measure(points: NDArray[np.floating]):
     for line_model in line_models:
         p, v = line_model
         distances.append(line_distance(center, normal, p, v))
-    return center, radius, normal, distances, plane_indices, line_segments_indices
+    return center, radius, normal, distances, base_plane_indices, line_segments_indices

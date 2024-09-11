@@ -1,3 +1,7 @@
+"""
+DataStore Class for Flux pattern with PyQt6
+"""
+
 from datetime import datetime
 from pydantic import BaseModel
 from typing import List
@@ -55,6 +59,15 @@ class DataStore(QObject):
   def image_path(self, value):
     self._image_path = value
     self.image_path_changed.emit(value)
+
+  auto_mode_changed = pyqtSignal(bool)
+  @property
+  def auto_mode(self):
+    return self._auto_mode
+  @auto_mode.setter
+  def auto_mode(self, value):
+    self._auto_mode = value
+    self.auto_mode_changed.emit(value)
 
   # Singletonパターン
   _instance = None

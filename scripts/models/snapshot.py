@@ -1,4 +1,6 @@
 import open3d as o3d
+import rospy
+from sensor_msgs.msg import PointCloud2
 
 def take_snapshot():
     """

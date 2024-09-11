@@ -52,16 +52,6 @@ def measure(points: NDArray[np.floating]):
     # 円盤フィッティング
     indices, center, normal, radius = detect_circle(points_cylinder_top, plane_model)
 
-    # 円盤とエッジを描画
-    mesh_disk = o3d.geometry.TriangleMesh.create_cylinder(radius=radius, height=3.0, resolution=50, split=1)
-    mesh_disk.compute_vertex_normals()
-    normal = normal / np.linalg.norm(normal)
-    rotation_axis = np.cross(np.array([0, 0, 1]), normal)
-    rotation_angle = np.arccos(np.dot(np.array([0, 0, 1]), normal))
-    rotation_matrix = mesh_disk.get_rotation_matrix_from_axis_angle(rotation_axis * rotation_angle)
-    mesh_disk.rotate(rotation_matrix, center=(0, 0, 0))
-    mesh_disk.translate(center)
-
     # 各エッジと円筒軸の間の距離を算出
     distances = []
     for line_model in line_models:

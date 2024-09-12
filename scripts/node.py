@@ -15,10 +15,10 @@ logger = Logger()
 
 class ROSNodeManager(Singleton):
   def __init__(self):
-    rospy.init_node("ply_processor", anonymous=True)
+    rospy.init_node("ply_measure_demo", anonymous=True)
 
     # Publishers
-    self.pub = rospy.Publisher("/ply_processor/result", String, queue_size=1)
+    self.pub = rospy.Publisher("/ply_measure_demo/result", String, queue_size=1)
 
     # Subscribers
     self.sub = rospy.Subscriber("/phoxi_camera/pointcloud", PointCloud2, rossub_callback)

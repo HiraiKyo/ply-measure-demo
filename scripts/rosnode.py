@@ -5,12 +5,12 @@ PubSub Manager for ROS
 from python_app_utils.log import Logger
 from python_app_utils.singleton import Singleton
 import rospy
-from datastore import DataStore
-from actions import rossub_callback
+import datastore
+import actions
 from sensor_msgs.msg import PointCloud2
 from std_msgs.msg import String
 
-dataStore = DataStore()
+dataStore = datastore.DataStore()
 logger = Logger()
 
 class ROSNodeManager(Singleton):
@@ -21,9 +21,7 @@ class ROSNodeManager(Singleton):
     self.pub = rospy.Publisher("/ply_measure_demo/result", String, queue_size=1)
 
     # Subscribers
-    self.sub = rospy.Subscriber("/phoxi_camera/pointcloud", PointCloud2, rossub_callback)
-
-    rospy.spin()
+    self.sub = rospy.Subscriber("/phoxi_camera/pointcloud", PointCloud2, actions.rossub_callback)
 
   def publish(self, json_str: str):
-    self.pub.publish(str)
+    self.pub.publish(json_str)

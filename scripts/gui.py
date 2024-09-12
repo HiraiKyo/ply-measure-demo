@@ -5,14 +5,14 @@ from PyQt6.QtWidgets import QMainWindow, QScrollArea, QApplication, QLabel, QWid
 from PyQt6.QtGui import QFont, QTextOption, QFontMetrics, QPixmap
 from PyQt6.QtCore import Qt
 
-from datastore import DataStore
-from actions import on_click_auto, on_click_snapshot
+import datastore as ds
+import actions
 from python_app_utils.log import Logger
 
 FONT_SIZE = 16
 
 logger = Logger()
-datastore = DataStore()
+datastore = ds.DataStore()
 
 def open_gui():
   """
@@ -76,12 +76,12 @@ class ActionField(QWidget):
     hbox.addWidget(buttonClose)
 
     # ボタンのコールバック登録
-    buttonAuto.clicked.connect(on_click_auto)
+    buttonAuto.clicked.connect(actions.on_click_auto)
     buttonSnapshot.clicked.connect(self.start_snapshot)
     buttonClose.clicked.connect(QApplication.instance().quit)
 
   def start_snapshot(self):
-    th = threading.Thread(target=on_click_snapshot)
+    th = threading.Thread(target=actions.on_click_snapshot)
     th.setDaemon(True)
     th.start()
 class ValuesField(QWidget):

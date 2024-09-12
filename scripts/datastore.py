@@ -2,7 +2,6 @@
 DataStore Class for Flux pattern with PyQt6
 """
 
-from datetime import datetime
 from pydantic import BaseModel
 from typing import List
 import time

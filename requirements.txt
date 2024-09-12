@@ -1,3 +1,4 @@
 git+https://github.com/HiraiKyo/ply-processor-basics@v0.3.0#egg=ply_processor_basics
 git+https://github.com/HiraiKyo/python-app-utils@v0.3.0#egg=python_app_utils
 open3d==0.13.0
+ros_numpy

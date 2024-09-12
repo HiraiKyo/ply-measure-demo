@@ -1,21 +1,21 @@
-from datastore import DataStore
-from node import ROSNodeManager
-from utils.config import Config
-from gui import open_gui
+import datastore
+import rosnode
+from utils import config
+import gui
 from python_app_utils.log import Logger
 import rospy
 
 def main():
     # App Initialization
-    Config()
+    config.Config()
     logger = Logger()
-    logger.init(Config)
-    DataStore()
+    logger.init(config.Config)
+    datastore.DataStore()
 
     # Open ROS Node
-    node = ROSNodeManager()
+    rosnode.ROSNodeManager()
 
-    open_gui()
+    gui.open_gui()
 
 if __name__ == "__main__":
     main()

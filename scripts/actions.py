@@ -24,7 +24,7 @@ def on_click_snapshot() -> bool:
     pcd = snapshot.take_snapshot()
 
     # ply-processor-basicsを利用して円柱中心とエッジを検出
-    center, radius, normal, distances, plane_indices, line_segments_indices = measure(np.asarray(pcd.points))
+    center, radius, normal, distances, plane_indices, line_segments_indices = measure.measure(np.asarray(pcd.points))
 
     # Datastore層に結果を保存(->FlexパターンでGUI更新)
     distanceSets = [ds.DistanceSet(

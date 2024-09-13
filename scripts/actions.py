@@ -4,11 +4,14 @@ import numpy as np
 import open3d as o3d
 from models import visualize, measure
 import datastore as ds
+from models import gen_points
 from utils import config, pc2
 from sensor_msgs.msg import PointCloud2
+import rosnode
 
 dataStore = ds.DataStore()
 logger = Logger()
+node = rosnode.ROSNodeManager()
 
 def on_click_auto():
   dataStore.auto_mode = not dataStore.auto_mode
@@ -123,6 +126,23 @@ def rossub_callback(msg: PointCloud2):
     )
     dataStore.update_measure_result(result)
 
+    # ROSにトピックをPublish
+    node.publish_result(result.model_dump_json())
+
+    publish_points = np.asarray([])
+    # エッジ点をPublish
+    for i, indices in enumerate(line_segments_indices):
+      edge_points = points[indices]
+      points_generated = gen_points.segment_to_points(edge_points[0], edge_points[1])
+      publish_points = np.concatenate([points, points_generated], axis=0)
+
+    # 中心軸の点をPublish
+    points_generated = gen_points.segment_to_points(center - normal * 100, center + normal * 100)
+    publish_points = np.concatenate([points, points_generated], axis=0)
+    publish_pcd = o3d.geometry.PointCloud()
+    publish_pcd.points = o3d.utility.Vector3dVector(publish_points)
+    node.publish_pointcloud(pc2.to_msg(publish_pcd))
+
     # 画像データ生成を開始
     pcd.paint_uniform_color([0.5, 0.5, 0.5])
     disk = visualize.generate_disk_mesh(dataStore.measure_result.center, dataStore.measure_result.radius, dataStore.measure_result.normal)
@@ -158,10 +178,8 @@ def rossub_callback(msg: PointCloud2):
       result.distances[i] = updated_distanceSet
       dataStore.update_measure_result(result)
 
-    return
   except Exception as e:
     logger.error(f"Failed to take snapshot. {e}")
-    return
   finally:
     # 終了処理
     dataStore.finish_run()

@@ -66,6 +66,8 @@ class ActionField(QWidget):
 
     buttonAuto = QPushButton("Auto", self)
     hbox.addWidget(buttonAuto)
+    labelAuto = QLabel("Auto Mode: ")
+    labelStatusAuto = QLabel("OFF")
     buttonSnapshot = QPushButton("Snapshot", self)
     hbox.addWidget(buttonSnapshot)
 
@@ -77,6 +79,7 @@ class ActionField(QWidget):
 
     # ボタンのコールバック登録
     buttonAuto.clicked.connect(actions.on_click_auto)
+    datastore.auto_mode_changed.connect(lambda value: labelStatusAuto.setText("ON" if value else "OFF"))
     buttonSnapshot.clicked.connect(self.start_snapshot)
     buttonClose.clicked.connect(QApplication.instance().quit)
 

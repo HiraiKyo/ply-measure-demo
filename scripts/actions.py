@@ -11,8 +11,6 @@ import rosnode
 
 dataStore = ds.DataStore()
 logger = Logger()
-node = rosnode.ROSNodeManager()
-
 def on_click_auto():
   dataStore.auto_mode = not dataStore.auto_mode
   pass
@@ -89,97 +87,3 @@ def on_click_snapshot() -> bool:
     # 終了処理
     dataStore.finish_run()
 
-def rossub_callback(msg: PointCloud2):
-  """
-  ROS Subscriber Callback
-  """
-  try:
-    # 開始前処理
-    dataStore.start_run()
-
-    # auto_modeか確認
-    if not dataStore.auto_mode:
-      return
-
-    # PointCloud2 msgを変換
-    points = pc2.pc2_to_numpy(msg)
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(points)
-
-    # ply-processor-basicsを利用して円柱中心とエッジを検出
-    center, radius, normal, distances, plane_indices, line_segments_indices = measure.measure(points)
-
-    # Datastore層に結果を保存(->FlexパターンでGUI更新)
-    distanceSets = [ds.DistanceSet(
-      distance=d,
-      line_segment_indices=line_segments_indices[i],
-      image_path=None
-    ) for i, d in enumerate(distances)]
-
-    result = ds.MeasureResult(
-      center=center,
-      radius=radius,
-      normal=normal,
-      distances=distanceSets,
-      plane_indices=plane_indices,
-      line_segments_indices=line_segments_indices
-    )
-    dataStore.update_measure_result(result)
-
-    # ROSにトピックをPublish
-    node.publish_result(result.model_dump_json())
-
-    publish_points = np.asarray([])
-    # エッジ点をPublish
-    for i, indices in enumerate(line_segments_indices):
-      edge_points = points[indices]
-      points_generated = gen_points.segment_to_points(edge_points[0], edge_points[1])
-      publish_points = np.concatenate([points, points_generated], axis=0)
-
-    # 中心軸の点をPublish
-    points_generated = gen_points.segment_to_points(center - normal * 100, center + normal * 100)
-    publish_points = np.concatenate([points, points_generated], axis=0)
-    publish_pcd = o3d.geometry.PointCloud()
-    publish_pcd.points = o3d.utility.Vector3dVector(publish_points)
-    node.publish_pointcloud(pc2.to_msg(publish_pcd))
-
-    # 画像データ生成を開始
-    pcd.paint_uniform_color([0.5, 0.5, 0.5])
-    disk = visualize.generate_disk_mesh(dataStore.measure_result.center, dataStore.measure_result.radius, dataStore.measure_result.normal)
-    line_set = visualize.generate_edge_line(points, dataStore.measure_result.plane_indices, dataStore.measure_result.line_segments_indices)
-    outpath = visualize.capture_image(
-      [pcd, disk, line_set],
-      dataStore.outdir,
-      "overview.png",
-      cam_front=config.Config.CAM_FRONT,
-      cam_lookat=dataStore.measure_result.center,
-      cam_up=[0, 0, 1],
-      cam_zoom=config.Config.CAM_ZOOM
-    )
-    dataStore.update_image(outpath)
-
-    # 各距離用の画像生成
-    for i in range(len(distances)):
-      line_set = visualize.generate_edge_line(points, plane_indices, [line_segments_indices[i]])
-      outpath = visualize.capture_image(
-        [disk, line_set],
-        dataStore.outdir,
-        f"distance_{i}.png",
-        cam_front=config.Config.CAM_FRONT,
-        cam_lookat=dataStore.measure_result.center,
-        cam_up=[0, 0, 1],
-        cam_zoom=config.Config.CAM_ZOOM
-      )
-      updated_distanceSet = ds.DistanceSet(
-        distance=result.distances[i].distance,
-        line_segment_indices=result.distances[i].line_segment_indices,
-        image_path=outpath
-      )
-      result.distances[i] = updated_distanceSet
-      dataStore.update_measure_result(result)
-
-  except Exception as e:
-    logger.error(f"Failed to take snapshot. {e}")
-  finally:
-    # 終了処理
-    dataStore.finish_run()

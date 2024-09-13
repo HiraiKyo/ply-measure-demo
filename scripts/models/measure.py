@@ -22,19 +22,30 @@ def line_distance(p0, v0, p1, v1):
 def measure(points: NDArray[np.floating]):
     # エッジ検出
     base_plane_indices, base_plane_model = detect_plane(points, threshold=1.0)
-    if base_plane_indices is None:
+    if base_plane_model is None or base_plane_indices is None:
         raise Exception("Failed to detect plane")
     indices, line_segments_indices, line_models = detect_line(points[base_plane_indices], base_plane_model)
 
+    # ミル部エッジ検出
+    outlier_indices = np.setdiff1d(np.arange(len(points)), base_plane_indices)
+    tmp = points[outlier_indices]
+    mil_plane_indices, mil_plane_model = detect_plane(tmp, threshold=1.0)
+    if mil_plane_model is None or mil_plane_indices is None:
+        raise Exception("Failed to detect mil plane")
+    mil_indices, mil_line_segments_indices, mil_line_models = detect_line(tmp[mil_plane_indices], mil_plane_model)
+
+    line_segments_indices = np.concatenate([line_segments_indices, mil_line_segments_indices])
+    line_models = np.concatenate([line_models, mil_line_models])
+
     # エッジを可視化
-    line_set = o3d.geometry.LineSet()
-    line_set.points = o3d.utility.Vector3dVector(points[base_plane_indices])
-    line_set.lines = o3d.utility.Vector2iVector(line_segments_indices)
+    # line_set = o3d.geometry.LineSet()
+    # line_set.points = o3d.utility.Vector3dVector(points[base_plane_indices])
+    # line_set.lines = o3d.utility.Vector2iVector(line_segments_indices)
     # o3d.visualization.draw_geometries([line_set], window_name="Detected Edge")
 
     # 円筒検出
     # 円筒上面の点群を取得
-    loops = 5
+    loops = 2
     tmp = points
     plane_indices, plane_model = base_plane_indices, base_plane_model
     for i in range(loops):

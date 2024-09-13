@@ -29,7 +29,7 @@ class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
     self.setWindowTitle("Saisun3D Viewer")
-    self.setGeometry(0, 0, 1920, 1080)
+    # self.setGeometry(0, 0, 1920, 1080)
 
     self.setup_japanese_font()
 

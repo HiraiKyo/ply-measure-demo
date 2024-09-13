@@ -86,6 +86,7 @@ class DataStore(QObject):
     self._running_state = True
     self.initialize_data()
     self._running_state = False
+    self.auto_mode = False
     pass
 
   def update_measure_result(self, result: MeasureResult):

@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import QMainWindow, QScrollArea, QApplication, QLabel, QWid
 from PyQt6.QtGui import QFont, QTextOption, QFontMetrics, QPixmap
 from PyQt6.QtCore import Qt
 
+from utils import config
 import datastore as ds
 import actions
 from python_app_utils.log import Logger
@@ -13,6 +14,7 @@ FONT_SIZE = 16
 
 logger = Logger()
 datastore = ds.DataStore()
+cfg = config.Config()
 
 def open_gui():
   """
@@ -29,7 +31,7 @@ class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
     self.setWindowTitle("Saisun3D Viewer")
-    # self.setGeometry(0, 0, 1920, 1080)
+    self.setGeometry(0, 0, 360, 1080)
 
     self.setup_japanese_font()
 
@@ -47,7 +49,7 @@ class MainWindow(QMainWindow):
     h.addWidget(scroll_area)
     scroll_area.setWidgetResizable(True)
     scroll_area.setWidget(ValuesField())
-    h.addWidget(SnapshotField())
+    # h.addWidget(SnapshotField())
     v.addWidget(LogField())
 
     return None
@@ -67,7 +69,9 @@ class ActionField(QWidget):
     buttonAuto = QPushButton("Auto", self)
     hbox.addWidget(buttonAuto)
     labelAuto = QLabel("Auto Mode: ")
+    hbox.addWidget(labelAuto)
     labelStatusAuto = QLabel("OFF")
+    hbox.addWidget(labelStatusAuto)
     buttonSnapshot = QPushButton("Snapshot", self)
     hbox.addWidget(buttonSnapshot)
 
@@ -113,7 +117,7 @@ class ValuesField(QWidget):
       # リスト長変更は計測結果の変更を意味するため、テーブルを再生成する
       self.initUI()
       for i, distance in enumerate(result["distances"]):
-        v = ValueTableRowBoxLayout(f"Distance {i}", i)
+        v = ValueTableRowBoxLayout(f"Distance {i}", i, color=cfg.RGB_TABLE[i])
         self.vbox.addLayout(v)
 
   def initUI(self):
@@ -174,7 +178,7 @@ class ValueFieldBoxLayout(QHBoxLayout):
     self.qtext.setText(updatedText)
 
 class ValueTableRowBoxLayout(QHBoxLayout):
-  def __init__(self, label, index: int):
+  def __init__(self, label, index: int, color=[1, 1, 1]):
     super().__init__()
 
     self.index = index
@@ -191,24 +195,25 @@ class ValueTableRowBoxLayout(QHBoxLayout):
     self.qtext.setWordWrapMode(QTextOption.WrapMode.NoWrap)
     self.qtext.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
     self.qtext.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
+    self.qtext.setStyleSheet(f"background-color: rgb({color[0] * 255}, {color[1] * 255}, {color[2] * 255});")
     self.addWidget(self.qtext)
 
-    self.qimg = QLabel()
-    self.qimg.setAlignment(Qt.AlignmentFlag.AlignCenter)
-    self.qimg.setFixedSize(320, 240)
-    self.addWidget(self.qimg)
-    self.addItem(HorizontalSpacer())
+    # self.qimg = QLabel()
+    # self.qimg.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    # self.qimg.setFixedSize(320, 240)
+    # self.addWidget(self.qimg)
+    # self.addItem(HorizontalSpacer())
 
     self.on_change(datastore.measure_result.model_dump())
     datastore.measure_result_changed.connect(self.on_change)
 
   def on_change(self, result: dict):
     currentText = self.qtext.toPlainText()
-    currentImagePath = None
-    try:
-      currentImagePath = self.qimg.pixmap().toImage().text()
-    except Exception:
-      currentImagePath = None
+    # currentImagePath = None
+    # try:
+    #   currentImagePath = self.qimg.pixmap().toImage().text()
+    # except Exception:
+    #   currentImagePath = None
 
     if "distances" not in result:
       return
@@ -222,19 +227,19 @@ class ValueTableRowBoxLayout(QHBoxLayout):
     if updatedText != currentText:
       self.qtext.setText(updatedText)
 
-    # 画像パスが更新されている場合にのみ更新
-    updatedImagePath = distance["image_path"]
-    if updatedImagePath != currentImagePath:
-      if updatedImagePath is None:
-        self.qimg.clear()
-      else:
-        pixmap = QPixmap(f"{updatedImagePath}")
-        scaled_pixmap = pixmap.scaled(
-          self.qimg.size(),
-          Qt.AspectRatioMode.KeepAspectRatio,
-          Qt.TransformationMode.SmoothTransformation
-        )
-        self.qimg.setPixmap(scaled_pixmap)
+    # # 画像パスが更新されている場合にのみ更新
+    # updatedImagePath = distance["image_path"]
+    # if updatedImagePath != currentImagePath:
+    #   if updatedImagePath is None:
+    #     self.qimg.clear()
+    #   else:
+    #     pixmap = QPixmap(f"{updatedImagePath}")
+    #     scaled_pixmap = pixmap.scaled(
+    #       self.qimg.size(),
+    #       Qt.AspectRatioMode.KeepAspectRatio,
+    #       Qt.TransformationMode.SmoothTransformation
+    #     )
+    #     self.qimg.setPixmap(scaled_pixmap)
 
 class SnapshotField(QWidget):
   def __init__(self):

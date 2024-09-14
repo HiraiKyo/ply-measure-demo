@@ -3,7 +3,7 @@ DataStore Class for Flux pattern with PyQt6
 """
 
 from pydantic import BaseModel
-from typing import List
+from typing import List, Tuple
 import time
 import os
 import io
@@ -15,7 +15,8 @@ from typing import Union
 
 class DistanceSet(BaseModel):
   distance: float
-  line_segment_indices: List[int]
+  line_segment_points: Tuple[List[float], List[float]]
+  group: int
   image_path: Union[str, None]
 
 class MeasureResult(BaseModel):
@@ -24,7 +25,6 @@ class MeasureResult(BaseModel):
   normal: List[float]
   distances: List[DistanceSet]
   plane_indices: List[int]
-  line_segments_indices: List[List[int]]
 
 logger = Logger()
 
@@ -90,9 +90,6 @@ class DataStore(QObject):
     pass
 
   def update_measure_result(self, result: MeasureResult):
-    # result validation
-    assert len(result.distances) == len(result.line_segments_indices)
-
     self.measure_result = result
     # PydanticからCSV保存
     fields = list(self.measure_result.model_fields.keys())
@@ -134,6 +131,5 @@ class DataStore(QObject):
       normal=[],
       distances=[],
       plane_indices=[],
-      line_segments_indices=[]
     )
     self.image_path = None

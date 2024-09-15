@@ -91,6 +91,7 @@ class DataStore(QObject):
 
   def update_measure_result(self, result: MeasureResult):
     self.measure_result = result
+    print(result.distances)
     # PydanticからCSV保存
     fields = list(self.measure_result.model_fields.keys())
 

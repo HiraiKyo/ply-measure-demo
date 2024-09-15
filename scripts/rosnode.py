@@ -58,7 +58,7 @@ class ROSNodeManager(Singleton):
       # ply-processor-basicsを利用して円柱中心とエッジを検出
       center, radius, normal, plane_indices, line_segment_points, distances, mil_line_segment_points, mil_distances = measure.measure(points)
 
-      # Datastore層に結果を保存(->FlexパターンでGUI更新)
+      # Datastore層に結果を保存(->FluxパターンでGUI更新)
       distanceSets = [ds.DistanceSet(
         distance=d,
         group=0,
@@ -90,7 +90,7 @@ class ROSNodeManager(Singleton):
       for i in range(len(distanceSets)):
         edge_start_point = distanceSets[i].line_segment_points[0]
         edge_end_point = distanceSets[i].line_segment_points[1]
-        points_generated = gen_points.segment_to_points(edge_start_point, edge_end_point)
+        points_generated = gen_points.segment_to_points(np.asarray(edge_start_point), np.asarray(edge_end_point))
         publish_points = np.concatenate([publish_points, points_generated], axis=0)
         colors = np.zeros((len(points_generated), 3))
         colors[:] = cfg.RGB_TABLE[i]

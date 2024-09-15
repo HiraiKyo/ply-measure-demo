@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
   def __init__(self):
     super().__init__()
     self.setWindowTitle("Saisun3D Viewer")
-    self.setGeometry(0, 0, 360, 1080)
+    self.setGeometry(0, 0, 360, 880)
 
     self.setup_japanese_font()
 
@@ -91,6 +91,7 @@ class ActionField(QWidget):
     th = threading.Thread(target=actions.on_click_snapshot)
     th.setDaemon(True)
     th.start()
+
 class ValuesField(QWidget):
   def __init__(self):
     super().__init__()
@@ -111,9 +112,6 @@ class ValuesField(QWidget):
 
     # データがある場合はテーブルを生成
     if "distances" in result:
-      if len(result["distances"]) == len(self.vbox.children()) + 2:
-        return
-
       # リスト長変更は計測結果の変更を意味するため、テーブルを再生成する
       self.initUI()
       for i, distance in enumerate(result["distances"]):
@@ -195,7 +193,12 @@ class ValueTableRowBoxLayout(QHBoxLayout):
     self.qtext.setWordWrapMode(QTextOption.WrapMode.NoWrap)
     self.qtext.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
     self.qtext.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
-    self.qtext.setStyleSheet(f"background-color: rgb({color[0] * 255}, {color[1] * 255}, {color[2] * 255});")
+    self.qtext.setStyleSheet(f"""
+            QTextEdit {{
+                border: 4px solid rgb({color[0] * 255}, {color[1] * 255}, {color[2] * 255});  /* Change 'red' to any color you prefer */
+                border-radius: 5px;     /* Optional: rounds the corners */
+            }}
+        """)
     self.addWidget(self.qtext)
 
     # self.qimg = QLabel()

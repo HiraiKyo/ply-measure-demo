@@ -5,3 +5,10 @@
 ## Requirements
 
 - Python 3.8
+
+## Install
+
+```sh
+pip install --upgrade pip setuptools wheel
+apt install qt6-base-dev
+```

@@ -62,18 +62,12 @@ def reorder_segment_points(
         np.concatenate([segment_points[1][min_index:], segment_points[1][:min_index]])
     )
     new_line_models = line_models[min_index:] + line_models[:min_index]
-    
-    # Clockwise reorder
-    relative_vectors = new_segment_points[0] - new_segment_points[0][0]
-    normal = np.cross(relative_vectors[1] - relative_vectors[0], relative_vectors[2] - relative_vectors[0])
-    if normal[2] < 0:
-        normal = -normal
-    
-    cross_products = np.cross(relative_vectors, normal)
-    sorted_indices = np.argsort(cross_products[:, 2])
-    ordered_vertices = new_segment_points[0][sorted_indices]
 
-    if np.all(new_segment_points[0][1] != ordered_vertices[1]):
+    # Clockwise reorder
+    v1 = new_segment_points[1][0] - new_segment_points[0][0]
+    v2 = new_segment_points[1][1] - new_segment_points[0][1]
+    normal = np.cross(v2, v1)
+    if normal[2] < 0:
         new_segment_points = (
             new_segment_points[1][::-1],
             new_segment_points[0][::-1]
@@ -88,24 +82,16 @@ def pick_largest_segments(segment_points, line_models, amount=4):
     """
     Pick largest segments, keeping order
     """
-    print("BEFORE")
-    print(segment_points)
     edge_lengths = []
     for i in range(len(segment_points[0])):
         length = cal_edge_length(segment_points[0][i], segment_points[1][i])
         edge_lengths.append((i, length))
     ordered_lengths = sorted(edge_lengths, key=lambda x: x[1], reverse=True)[:amount]
-    print("LENGTHS")
-    print(edge_lengths)
-    print("ORDERED")
-    print(ordered_lengths)
     picked_segments = (
         [segment_points[0][i] for i, _ in ordered_lengths],
         [segment_points[1][i] for i, _ in ordered_lengths]
     )
     picked_line_models = [line_models[i] for i, _ in ordered_lengths]
-    print("AFTER")
-    print(picked_segments)
     return picked_segments, picked_line_models
 
 def remove_short_edges(

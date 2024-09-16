@@ -34,14 +34,18 @@ RGB_TABLE=[
     [0.75, 0.75, 0.75]
 ]
 
-ROS_SUB_TOPIC_SIM = "/sensors/capt_pc2"
-
 class Config(ConfigBase):
     PLACEHOLDER = "placeholder"
     CAM_FRONT = cam_presets["default"]
     CAM_ZOOM = 0.2
-#    ROS_SUB_TOPIC = "/phoxi_camera/pointcloud"
-    ROS_SUB_TOPIC = ROS_SUB_TOPIC_SIM
+    ROS_SUB_TOPIC = "/sensors/capt_pc2"
     ROS_PUB_TOPIC_RESULT = "/ply_measure_demo/result"
     ROS_PUB_TOPIC_POINTCLOUD = "/ply_measure_demo/pointcloud"
     RGB_TABLE = RGB_TABLE
+    BASE_PLANE_INDEX = 0
+    MIL_PLANE_INDEX = 2
+    CIRCLE_PLANE_INDEX = 4
+    BASE_EXPECTED_EDGES = 4
+    MIL_EXPECTED_EDGES = 4
+    CONVEX_HULL_EPSILON = 5
+    MIN_PLANE_POINTS = 1000

@@ -9,7 +9,6 @@ from ply_processor_basics.points.convex_hull import detect_circle
 from . import edge
 
 PLANE_THRESHOLD = 0.5
-MIN_PLANE_POINTS = 1000
 
 def line_distance(p0, v0, p1, v1):
     v0 = v0 / np.linalg.norm(v0)
@@ -28,7 +27,11 @@ def measure(
     points_raw: NDArray[np.floating],
     base_plane_index = 0,
     mil_plane_index = 2,
-    circle_plane_index = 4
+    circle_plane_index = 4,
+    base_expected_edges = 4,
+    mil_expected_edges = 4,
+    min_plane_points = 1000,
+    line_epsilon=5.0
 ):
     tmp = points_raw
 
@@ -40,10 +43,10 @@ def measure(
         tmp = tmp[outlier_indices]
     
     # エッジ検出
-    segment_points, line_models = edge.find_edge_segments(points_raw, base_plane_index, expected_edges=4)
+    segment_points, line_models = edge.find_edge_segments(points_raw, base_plane_index, expected_edges=base_expected_edges, min_plane_points=min_plane_points, plane_threshold=PLANE_THRESHOLD, epsilon=line_epsilon)
 
     # ミル部エッジ検出
-    mil_segment_points, mil_line_models = edge.find_edge_segments(points_raw, mil_plane_index, expected_edges=4)
+    mil_segment_points, mil_line_models = edge.find_edge_segments(points_raw, mil_plane_index, expected_edges=mil_expected_edges, min_plane_points=min_plane_points, plane_threshold=PLANE_THRESHOLD, epsilon=line_epsilon)
 
     # 円筒検出
     # 円筒上面の点群を取得
@@ -68,8 +71,8 @@ def measure(
     tmp = tmp[plane_indices][clusters[0]]
     
     # Too few points on the plane should be an error
-    if len(clusters[0]) < MIN_PLANE_POINTS:
-        raise Exception(f"Plane points is less than {MIN_PLANE_POINTS}")
+    if len(clusters[0]) < min_plane_points:
+        raise Exception(f"Plane points is less than {min_plane_points}")
 
     # 円盤フィッティング
     indices, center, normal, radius = detect_circle(tmp, plane_model)

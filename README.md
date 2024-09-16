@@ -10,5 +10,10 @@
 
 ```sh
 pip install --upgrade pip setuptools wheel
+pip install sip numpy open3d
+apt update
 apt install qt6-base-dev
+pip install -r requirements.txt
 ```
+
+## Configuration

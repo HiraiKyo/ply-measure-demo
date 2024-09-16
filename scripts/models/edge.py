@@ -3,7 +3,7 @@ from ply_processor_basics.points.convex_hull import detect_line
 from ply_processor_basics.points.ransac import detect_plane
 from ply_processor_basics.points.clustering import plane_clustering
 
-def find_edge_segments(points, plane_index, expected_edges=4, plane_threshold=0.5, min_plane_points = 1000):
+def find_edge_segments(points, plane_index, expected_edges=4, plane_threshold=0.5, min_plane_points = 1000, epsilon=5):
     line_segment_points = (np.empty((0, 3)), np.empty((0, 3)))
     tmp = points
     plane_indices = None
@@ -30,7 +30,7 @@ def find_edge_segments(points, plane_index, expected_edges=4, plane_threshold=0.
         raise Exception(f"Plane points is less than {min_plane_points}")
     
     # Detect edge line
-    indices, line_segments_indices, line_models = detect_line(tmp, plane_model, epsilon=5)
+    indices, line_segments_indices, line_models = detect_line(tmp, plane_model, epsilon=epsilon)
     for i in range(len(line_segments_indices)):
         line_segment_points = (
             np.concatenate([line_segment_points[0], np.asarray([tmp[line_segments_indices[i][0]]])]),

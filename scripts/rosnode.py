@@ -56,7 +56,16 @@ class ROSNodeManager(Singleton):
       pcd.points = o3d.utility.Vector3dVector(points)
 
       # ply-processor-basicsを利用して円柱中心とエッジを検出
-      center, radius, normal, plane_indices, line_segment_points, distances, mil_line_segment_points, mil_distances = measure.measure(points)
+      center, radius, normal, plane_indices, line_segment_points, distances, mil_line_segment_points, mil_distances = measure.measure(
+        points,
+        base_plane_index=cfg.BASE_PLANE_INDEX,
+        mil_plane_index=cfg.MIL_PLANE_INDEX,
+        circle_plane_index=cfg.CIRCLE_PLANE_INDEX,
+        base_expected_edges=cfg.BASE_EXPECTED_EDGES,
+        mil_expected_edges=cfg.MIL_EXPECTED_EDGES,
+        min_plane_points=cfg.MIN_PLANE_POINTS,
+        line_epsilon=cfg.CONVEX_HULL_EPSILON
+      )
 
       # Datastore層に結果を保存(->FluxパターンでGUI更新)
       distanceSets = [ds.DistanceSet(

@@ -24,18 +24,20 @@ def find_edge_segments(points, plane_index, expected_edges=4, plane_threshold=0.
     if len(clusters) == 0:
         raise Exception("Failed to remove noise on plane")
     tmp = tmp[plane_indices][clusters[0]]
-    
+
     # Too few points on the plane should be an error
     if len(clusters[0]) < min_plane_points:
         raise Exception(f"Plane points is less than {min_plane_points}")
-    
+
     # Detect edge line
-    indices, line_segments_indices, line_models = detect_line(tmp, plane_model, epsilon=epsilon)
-    for i in range(len(line_segments_indices)):
+    lines = detect_line(tmp, plane_model)
+    line_models = []
+    for indices, line_segments_points, line_model in lines:
         line_segment_points = (
             np.concatenate([line_segment_points[0], np.asarray([tmp[line_segments_indices[i][0]]])]),
             np.concatenate([line_segment_points[1], np.asarray([tmp[line_segments_indices[i][1]]])])
         )
+        line_models.append(line_model)
 
     # Postprocess: find 4 most longest edges, ordered by the length
     line_segment_points, line_models = reorder_segment_points(line_segment_points, line_models)

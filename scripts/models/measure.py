@@ -1,8 +1,5 @@
-from typing import List, Tuple
-import open3d as o3d
 import numpy as np
 from numpy.typing import NDArray
-from ply_processor_basics.points.convex_hull import detect_line
 from ply_processor_basics.points.ransac import detect_plane
 from ply_processor_basics.points.clustering import plane_clustering
 from ply_processor_basics.points.convex_hull import detect_circle

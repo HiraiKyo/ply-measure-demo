@@ -78,11 +78,11 @@ def measure(
     distances = []
     for line_model in line_models:
         p, v = line_model
-        distances.append(line_distance(center, normal, p, v))
+        distances.append(line_distance(center, plane_model[:3], p, v))
     # ミルの各エッジと円筒軸の間の距離を算出
     mil_distances = []
     for line_model in mil_line_models:
         p, v = line_model
-        mil_distances.append(line_distance(center, normal, p, v))
-    return center, radius, normal, base_plane_indices, segment_points, distances, mil_segment_points, mil_distances
+        mil_distances.append(line_distance(center, plane_model[:3], p, v))
+    return center, radius, plane_model[:3], base_plane_indices, segment_points, distances, mil_segment_points, mil_distances
 

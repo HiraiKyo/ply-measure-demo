@@ -32,10 +32,10 @@ def find_edge_segments(points, plane_index, expected_edges=4, plane_threshold=0.
     # Detect edge line
     lines = detect_line(tmp, plane_model)
     line_models = []
-    for indices, line_segments_points, line_model in lines:
+    for indices, seg_points, line_model in lines:
         line_segment_points = (
-            np.concatenate([line_segment_points[0], np.asarray([tmp[line_segments_indices[i][0]]])]),
-            np.concatenate([line_segment_points[1], np.asarray([tmp[line_segments_indices[i][1]]])])
+            np.concatenate([line_segment_points[0], seg_points[0].reshape(1, -1)]),
+            np.concatenate([line_segment_points[1], seg_points[1].reshape(1, -1)])
         )
         line_models.append(line_model)
 

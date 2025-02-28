@@ -16,4 +16,9 @@ apt install qt6-base-dev
 pip install -r requirements.txt
 ```
 
-## Configuration
+## Docker
+```sh
+docker compose up -d
+docker compose exec ply-measure-demo bash
+$ cd catkin_ws
+```

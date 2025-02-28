@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# mypy: ignore-errors
+
 import datastore
 import rosnode
 from utils import config

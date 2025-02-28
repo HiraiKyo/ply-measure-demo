@@ -1,0 +1,4 @@
+<launch>
+  <node name="react_webserver" pkg="eel-ros1" type="reactdev.sh" output="screen" />
+  <node pkg="ply-measure-demo" name="ply_measure_demo" type="react.py" args="--dev" output="screen" />
+</launch>

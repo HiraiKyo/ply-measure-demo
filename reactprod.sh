@@ -26,5 +26,5 @@ echo "react-scripts location PATH : $REACT_SCRIPTS"
 
 # デバッグ情報を表示しながらフォアグラウンドで実行
 cd /root/catkin_ws/src/$PACKAGE_NAME$WEB_DIR && \
-NODE_ENV=development \
-$NODE_BIN/react-scripts start > /tmp/react-server.log 2>&1 &
+NODE_ENV=production \
+$NODE_BIN/react-scripts build > /tmp/react-server.log 2>&1 &

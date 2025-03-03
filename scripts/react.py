@@ -13,6 +13,7 @@ import argparse
 from eel_ros1.actions import *  # noqa: F403
 from eel_ros1.actions_util import *  # noqa: F403
 from eel_ros1.models import rosparam # FIXME: おそらくros_serviceのインポートはここ必須
+from ply_measure.for_react import *  # noqa: F403
 
 PACKAGE_NAME = "ply-measure-demo"
 OPTIONS = {

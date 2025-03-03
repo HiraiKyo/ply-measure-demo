@@ -3,7 +3,7 @@ import { Button, ButtonProps } from '@mui/material';
 
 interface CallEelFunctionProps extends ButtonProps {
   callback: Function;
-  onSuccess: (data: any) => void;
+  onSuccess?: (data: any) => void;
 }
 
 export const CallEelFunctionButton: React.FC<CallEelFunctionProps> = ({
@@ -15,7 +15,7 @@ export const CallEelFunctionButton: React.FC<CallEelFunctionProps> = ({
   const handleClick = async () => {
     try {
       const result = await callback();
-      onSuccess(result);
+      if(onSuccess) onSuccess(result);
     } catch (error) {
       console.error('Eel function error:', error);
     }

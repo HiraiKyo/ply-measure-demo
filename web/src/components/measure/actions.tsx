@@ -89,8 +89,7 @@ export function MeasureActions() {
             />
           </PublisherButton>
           <CallEelFunctionButton
-            callback={() => eel.open_filebrowser()()}
-            onSuccess={(filepath) => console.log('Selected file:', filepath)}
+            callback={() => eel.take_snapshot()()}
             variant="text"
             sx={buttonSx}
           >
@@ -98,6 +97,20 @@ export function MeasureActions() {
               mainText="ファイル読込"
               subTexts={[
                 'Python Function',
+                "eel.take_snapshot()"
+              ]}
+            />
+          </CallEelFunctionButton>
+          <CallEelFunctionButton
+            callback={() => eel.process_pointcloud()()}
+            variant="text"
+            sx={buttonSx}
+          >
+            <ActionButtonContent
+              mainText="寸法算出開始"
+              subTexts={[
+                'Python Function',
+                "eel.process_pointcloud()"
               ]}
             />
           </CallEelFunctionButton>

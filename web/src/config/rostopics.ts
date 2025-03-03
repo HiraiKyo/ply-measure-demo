@@ -27,10 +27,18 @@ interface RosSubscribeTopicJson {
 }
 
 export const ROSSubscribeTopics: RosSubscribeTopicJson = {
-  "/measure/results": {
-    name: "/ply-process/measure/results",
+  "/measure/result": {
+    name: "/ply_measure_demo/result",
     "m-type": "std_msgs.msg.String",
-  }
+  },
+  "/measure/pointcloud": {
+    name: "/ply_measure_demo/pointcloud",
+    "m-type": "sensor_msgs.msg.PointCloud2",
+  },
+  "/measure/image": {
+    name: "/ply_measure_demo/image",
+    "m-type": "sensor_msgs.msg.Image",
+  },
 }
 
 export interface RosParamTopic {

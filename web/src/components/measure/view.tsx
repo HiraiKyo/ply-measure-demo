@@ -1,5 +1,7 @@
 import React from "react";
 import { Box, Paper, styled } from "@mui/material";
+import { ROSSubscribeTopics } from "../../config/rostopics";
+import { ROSSubscribeImage } from "../common/ros/subscriber/image";
 
 const ViewContainer = styled(Paper)({
 	flex: 2,
@@ -8,18 +10,15 @@ const ViewContainer = styled(Paper)({
 	borderRadius: "4px",
 });
 
-const Canvas = styled(Box)({
-	width: "100%",
-	height: "100%",
-	backgroundColor: "#1e1e1e",
-	border: "1px solid #404040",
-	borderRadius: "2px",
-});
-
 export const MeasureView = () => {
 	return (
 		<ViewContainer>
-			<Canvas id="measure-view" />
+			<ROSSubscribeImage
+				name={ROSSubscribeTopics["/measure/image"].name}
+				messageType={ROSSubscribeTopics["/measure/image"]["m-type"]}
+				width={640}
+				height={480}
+			/>
 		</ViewContainer>
 	);
 };

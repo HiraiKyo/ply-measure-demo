@@ -9,6 +9,8 @@ import { HomePage } from "./pages/home";
 import { RosTopicsPage } from "./pages/rostopics";
 import { SettingsPage } from "./pages/settings";
 
+export const eel = (window as any).eel;
+
 function App() {
 	return (
 		<ThemeProvider theme={theme}>

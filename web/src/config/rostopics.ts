@@ -9,7 +9,7 @@ interface RosPublishTopicJson {
 }
 
 export const ROSPublishTopics: RosPublishTopicJson = {
-  "/measure/start": {
+  "/snapshot": {
     name: "/ply-process/measure/start",
     "m-type": "std_msgs.msg.Bool",
     initialValue: true

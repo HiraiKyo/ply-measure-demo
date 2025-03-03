@@ -7,6 +7,8 @@ import {
 import { Send as SendIcon } from '@mui/icons-material';
 import { PublisherButton } from '../common/ros/publisher/button';
 import { ROSPublishTopics } from '../../config/rostopics';
+import { eel } from '../../App';
+import { CallEelFunctionButton } from '../common/eel/call-function';
 
 export interface ActionItemProps {
   id: string;
@@ -33,10 +35,12 @@ const StyledListItem = styled(ListItem)({
   width: 'auto',
   flex: '0 0 auto',
   padding: 0,
+  gap: 4,
 });
 
 const buttonSx = {
   minWidth: '200px',
+  height: '100%',
   border: '1px solid',
   borderColor: 'grey.800',
   borderRadius: 1,
@@ -64,47 +68,69 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 }));
 
 export function MeasureActions() {
-  const actions = [
-    {
-      ...ROSPublishTopics["/measure/start"],
-      label: "ピン計測開始",
-    }
-  ]
-
   return (
     <StyledPaper elevation={2}>
       <StyledList>
         <StyledListItem disablePadding>
-          {actions.map((action) => (
-            <PublisherButton
-              key={action.name}
-              name={action.name}
-              messageValue={action.initialValue}
-              messageType={action['m-type']}
-              variant="text"
-              sx={buttonSx}
+          <PublisherButton
+            key={ROSPublishTopics["/snapshot"].name}
+            name={ROSPublishTopics["/snapshot"].name}
+            messageValue={ROSPublishTopics["/snapshot"].initialValue}
+            messageType={ROSPublishTopics["/snapshot"]['m-type']}
+            variant="text"
+            sx={buttonSx}
             >
-              <Stack alignItems="flex-start">
-                <IconWrapper>
-                  <SendIcon />
-                  <Typography variant="body1" fontWeight="medium">
-                    {action.label}
-                  </Typography>
-                </IconWrapper>
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  sx={{
-                    opacity: 0.7,
-                  }}
-                >
-                  {action.name}
-                </Typography>
-              </Stack>
-            </PublisherButton>
-          ))}
+            <ActionButtonContent
+              mainText="3D点群撮影"
+              subTexts={[
+                'ROS Publisher',
+                ROSPublishTopics["/snapshot"].name
+              ]}
+            />
+          </PublisherButton>
+          <CallEelFunctionButton
+            callback={() => eel.open_filebrowser()()}
+            onSuccess={(filepath) => console.log('Selected file:', filepath)}
+            variant="text"
+            sx={buttonSx}
+          >
+            <ActionButtonContent
+              mainText="ファイル読込"
+              subTexts={[
+                'Python Function',
+              ]}
+            />
+          </CallEelFunctionButton>
         </StyledListItem>
       </StyledList>
     </StyledPaper>
   );
 }
+
+interface ActionButtonContentProps {
+  mainText: string;
+  subTexts: string[];
+}
+
+const ActionButtonContent: React.FC<ActionButtonContentProps> = ({ mainText, subTexts }) => (
+  <Stack alignItems="flex-start">
+    <IconWrapper>
+      <SendIcon />
+      <Typography variant="body1" fontWeight="medium">
+        {mainText}
+      </Typography>
+    </IconWrapper>
+    {subTexts.map((text, index) => (
+      <Typography
+        key={index}
+        variant="body2"
+        color="text.secondary"
+        sx={{
+          opacity: 0.7,
+        }}
+        >
+        {text}
+      </Typography>
+    ))}
+  </Stack>
+);

@@ -1,4 +1,4 @@
 <launch>
-  <node name="react_webserver" pkg="ply-measure-demo" type="reactprod.sh" output="screen" />
+  <node name="react_build" pkg="ply-measure-demo" type="reactprod.sh" output="screen" />
   <node name="ply_measure_demo" pkg="ply-measure-demo" type="react.py" output="screen" />
 </launch>

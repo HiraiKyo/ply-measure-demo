@@ -65,6 +65,8 @@ export const ConfigPage = () => {
         MIL_EXPECTED_EDGES: parseInt(formData.get('MIL_EXPECTED_EDGES') as string),
         CONVEX_HULL_EPSILON: parseInt(formData.get('CONVEX_HULL_EPSILON') as string),
         MIN_PLANE_POINTS: parseInt(formData.get('MIN_PLANE_POINTS') as string),
+        LOG_LEVEL: formData.get('LOG_LEVEL') as string,
+        MODE: formData.get('MODE') as string,
       };
 
       const success = await eel.update_config(newConfig)();
@@ -198,6 +200,23 @@ export const ConfigPage = () => {
             sx={{ mb: 3 }}
           />
 
+          {/* 新しいフィールドを追加 */}
+          <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>その他の設定</Typography>
+          <TextField
+            fullWidth
+            label="LOG_LEVEL"
+            value={config.LOG_LEVEL}
+            onChange={(e) => setConfig({...config, LOG_LEVEL: e.target.value})}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="MODE"
+            value={config.MODE}
+            onChange={(e) => setConfig({...config, MODE: e.target.value})}
+            sx={{ mb: 3 }}
+          />
+          
           <Button type="submit" variant="contained" color="primary">
             設定を保存
           </Button>

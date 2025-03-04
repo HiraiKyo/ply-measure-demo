@@ -134,4 +134,10 @@ def process_pointcloud():
 
 @eel.expose
 def read_config():
-    return cfg.dict()
+    json = cfg.to_json()
+    return json
+
+@eel.expose
+def update_config(json_string: str):
+    cfg.update(json_string)
+    return

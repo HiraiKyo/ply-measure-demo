@@ -24,6 +24,7 @@ const Content = styled(Box)({
 	display: "flex",
 	flexDirection: "column",
 	backgroundColor: "#252526",
+	overflowY: "auto"  // 追加：縦スクロールを有効化
 });
 
 export function Layout({ children }: { children: React.ReactNode }) {

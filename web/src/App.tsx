@@ -8,6 +8,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { HomePage } from "./pages/home";
 import { RosTopicsPage } from "./pages/rostopics";
 import { SettingsPage } from "./pages/settings";
+import { ConfigPage } from "./pages/config";
 
 export const eel = (window as any).eel;
 
@@ -21,6 +22,7 @@ function App() {
 					<Routes>
 						<Route path="/" element={<HomePage />} />
 						<Route path="/topics" element={<RosTopicsPage />} />
+						<Route path="/config" element={<ConfigPage />} />
 						<Route path="/settings" element={<SettingsPage />} />
 					</Routes>
 				</Layout>

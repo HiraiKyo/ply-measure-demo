@@ -3,7 +3,7 @@ import { Box, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import { ListOutlined } from "@mui/icons-material";
+import { ListOutlined, TableViewOutlined } from "@mui/icons-material";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const SidebarContainer = styled(Box)({
@@ -49,6 +49,12 @@ export function Sidebar() {
 			<SidebarButton
 				active={pathname === "/topics"}
 				onClick={() => handleItemClick("/topics")}
+			>
+				<TableViewOutlined />
+			</SidebarButton>
+			<SidebarButton
+				active={pathname === "/config"}
+				onClick={() => handleItemClick("/config")}
 			>
 				<ListOutlined />
 			</SidebarButton>

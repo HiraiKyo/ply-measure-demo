@@ -81,8 +81,8 @@ export const MeasureResults = () => {
 					<TableHead>
 						<TableRow>
 							<StyledTableCell className="header">項目</StyledTableCell>
-							<StyledTableCell className="header">座標</StyledTableCell>
-							<StyledTableCell className="header">半径 or 距離</StyledTableCell>
+							<StyledTableCell className="header">中心座標</StyledTableCell>
+							<StyledTableCell className="header">半径</StyledTableCell>
 							<StyledTableCell className="header">ベクトル</StyledTableCell>
 						</TableRow>
 					</TableHead>
@@ -90,11 +90,23 @@ export const MeasureResults = () => {
 						{result && (
 							<TableRow>
 								<StyledTableCell>ピン中心</StyledTableCell>
-								<StyledTableCell>{result?.center.join(",")}</StyledTableCell>
+								<StyledTableCell>&#40;{result?.center.join(",")}&#41;</StyledTableCell>
 								<StyledTableCell>{result?.radius}</StyledTableCell>
-								<StyledTableCell>{result?.normal.join(",")}</StyledTableCell>
+								<StyledTableCell>&#40;{result?.normal.join(",")}&#41;</StyledTableCell>
 							</TableRow>
 						)}
+						</TableBody>
+				</Table>
+				<Table size="small">
+					<TableHead>
+						<TableRow>
+							<StyledTableCell className="header">項目</StyledTableCell>
+							<StyledTableCell className="header">始点 - 終点座標</StyledTableCell>
+							<StyledTableCell className="header">距離</StyledTableCell>
+							<StyledTableCell className="header"></StyledTableCell>
+						</TableRow>
+					</TableHead>
+					<TableBody>
 						{result?.distances.map((distance, i) => (
 							<TableRow key={`d-${i}`}>
 								<StyledTableCell>
@@ -111,7 +123,7 @@ export const MeasureResults = () => {
 									/>
 									エッジ
 								</StyledTableCell>
-								<StyledTableCell>{distance.line_segment_points[0].join(",")} - {distance.line_segment_points[1].join(",")}</StyledTableCell>
+								<StyledTableCell>&#40;{distance.line_segment_points[0].join(",")}&#41; - &#40;{distance.line_segment_points[1].join(",")}&#41;</StyledTableCell>
 								<StyledTableCell>{distance.distance}</StyledTableCell>
 								<StyledTableCell></StyledTableCell>
 							</TableRow>

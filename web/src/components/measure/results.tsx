@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { ROSSubscribeTopics } from "../../config/rostopics";
 import { MeasureResult } from "../../types/measure";
+import { useConfig } from "../../hooks/useConfig";
 
 const ROS_EVENTS = (window as any).ROS_EVENTS;
 
@@ -32,7 +33,17 @@ const StyledTableCell = styled(TableCell)({
 	},
 });
 
+const RGBColorToColor = (rgbColor: [number, number, number]) => {
+	// rgbColor: [r, g, b], 0 <= r, g, b <= 1
+	const r = Math.round(rgbColor[0] * 255);
+	const g = Math.round(rgbColor[1] * 255);
+	const b = Math.round(rgbColor[2] * 255);
+	return `rgb(${r}, ${g}, ${b})`;
+}
+
 export const MeasureResults = () => {
+	const { config } = useConfig();
+
 	const topicName = "/measure/result";
 
 	const [result, setResult] = useState<MeasureResult>();
@@ -116,7 +127,7 @@ export const MeasureResults = () => {
 											display: "inline-block",
 											width: 12,
 											height: 12,
-											backgroundColor: "red",
+											backgroundColor: config ? RGBColorToColor(config.RGB_TABLE[i]) : "gray",
 											marginRight: 1,
 											borderRadius: "2px",
 										}}

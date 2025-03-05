@@ -1,5 +1,5 @@
-type Vector3 = [number, number, number];
-type RGBColor = [number, number, number];
+export type Vector3 = [number, number, number];
+export type RGBColor = [number, number, number];
 
 export interface CamPresets {
   default: Vector3;
@@ -18,8 +18,8 @@ export interface CamPresets {
 export interface Config {
   PLACEHOLDER: string;
   CAM_FRONT: Vector3;
-  CAM_PRESETS: CamPresets;
   CAM_ZOOM: number;
+  CAM_UP: Vector3;
   ROS_SUB_TOPIC: string;
   ROS_PUB_TOPIC_RESULT: string;
   ROS_PUB_TOPIC_POINTCLOUD: string;

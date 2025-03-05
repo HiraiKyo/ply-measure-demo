@@ -4,21 +4,26 @@
 
 ## Requirements
 
-- Python 3.8
+- Docker
 
-## Install
-
-```sh
-pip install --upgrade pip setuptools wheel
-pip install sip numpy open3d
-apt update
-apt install qt6-base-dev
-pip install -r requirements.txt
-```
-
-## Docker
+## Run
 ```sh
 docker compose up -d
 docker compose exec ply-measure-demo bash
 $ cd catkin_ws
+$ roslaunch ply-measure-demo react.launch
 ```
+
+## Options
+
+### Show React Log
+```sh
+docker compose exec ply-measure-demo bash -c "tail -f /tmp/react-server.log"
+```
+
+### GUI Development
+```sh
+docker compose exec ply-measure-demo bash -c "cd catkin_ws && roslaunch ply-measure-demo react.dev.launch"
+```
+
+Connect localhost:3000 and hot reload is available.

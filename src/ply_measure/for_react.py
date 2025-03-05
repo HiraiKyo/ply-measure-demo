@@ -102,7 +102,7 @@ def process_pointcloud():
     points_generated = gen_points.segment_to_points(center - normal * 100, center + normal * 100)
     publish_points = np.concatenate([publish_points, points_generated], axis=0)
     colors = np.zeros((len(points_generated), 3))
-    colors[:] = [1, 1, 1]
+    colors[:] = [0, 0, 0]
     publish_colors = np.concatenate([publish_colors, colors])
     publish_pcd = o3d.geometry.PointCloud()
     publish_pcd.points = o3d.utility.Vector3dVector(publish_points)
@@ -118,10 +118,10 @@ def process_pointcloud():
       [pcd, publish_pcd],
       "/root/src/out",
       "overview.png",
-      cam_front=config.Config.CAM_FRONT,
+      cam_front=cfg.CAM_FRONT,
       cam_lookat=result.center,
-      cam_up=[0, 0, 1],
-      cam_zoom=config.Config.CAM_ZOOM
+      cam_up=cfg.CAM_UP,
+      cam_zoom=cfg.CAM_ZOOM 
     )
 
     # 画像ファイルを読み込んで、ROSMessageに変換してPublish

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Paper, styled } from "@mui/material";
+import { Paper, styled } from "@mui/material";
 import { ROSSubscribeTopics } from "../../config/rostopics";
 import { ROSSubscribeImage } from "../common/ros/subscriber/image";
 
@@ -16,8 +16,8 @@ export const MeasureView = () => {
 			<ROSSubscribeImage
 				name={ROSSubscribeTopics["/measure/image"].name}
 				messageType={ROSSubscribeTopics["/measure/image"]["m-type"]}
-				width={640}
-				height={480}
+				width={1280}
+				height={960}
 			/>
 		</ViewContainer>
 	);

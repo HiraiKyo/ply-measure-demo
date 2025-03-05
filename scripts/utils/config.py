@@ -42,7 +42,6 @@ class Config(ConfigBase):
     ROS_PUB_TOPIC_RESULT = "/ply_measure_demo/result"
     ROS_PUB_TOPIC_POINTCLOUD = "/ply_measure_demo/pointcloud"
     ROS_PUB_TOPIC_IMAGE = "/ply_measure_demo/image"
-    RGB_TABLE = RGB_TABLE
     BASE_PLANE_INDEX = 0
     MIL_PLANE_INDEX = 2
     CIRCLE_PLANE_INDEX = 4

@@ -92,8 +92,8 @@ export const MeasureResults = () => {
 					<TableHead>
 						<TableRow>
 							<StyledTableCell className="header">項目</StyledTableCell>
-							<StyledTableCell className="header">中心座標</StyledTableCell>
 							<StyledTableCell className="header">半径</StyledTableCell>
+							<StyledTableCell className="header">中心座標</StyledTableCell>
 							<StyledTableCell className="header">ベクトル</StyledTableCell>
 						</TableRow>
 					</TableHead>
@@ -101,9 +101,9 @@ export const MeasureResults = () => {
 						{result && (
 							<TableRow>
 								<StyledTableCell>ピン中心</StyledTableCell>
-								<StyledTableCell>&#40;{result?.center.join(",")}&#41;</StyledTableCell>
-								<StyledTableCell>{result?.radius}</StyledTableCell>
-								<StyledTableCell>&#40;{result?.normal.join(",")}&#41;</StyledTableCell>
+								<StyledTableCell>{roundNumber(result?.radius, 3)}</StyledTableCell>
+								<StyledTableCell>&#40;{roundVector3(result?.center, 3).join(", ")}&#41;</StyledTableCell>
+								<StyledTableCell>&#40;{roundVector3(result?.normal, 3).join(", ")}&#41;</StyledTableCell>
 							</TableRow>
 						)}
 						</TableBody>
@@ -112,8 +112,8 @@ export const MeasureResults = () => {
 					<TableHead>
 						<TableRow>
 							<StyledTableCell className="header">項目</StyledTableCell>
-							<StyledTableCell className="header">始点 - 終点座標</StyledTableCell>
 							<StyledTableCell className="header">距離</StyledTableCell>
+							<StyledTableCell className="header">始点 - 終点座標</StyledTableCell>
 							<StyledTableCell className="header"></StyledTableCell>
 						</TableRow>
 					</TableHead>
@@ -134,8 +134,8 @@ export const MeasureResults = () => {
 									/>
 									エッジ
 								</StyledTableCell>
-								<StyledTableCell>&#40;{distance.line_segment_points[0].join(",")}&#41; - &#40;{distance.line_segment_points[1].join(",")}&#41;</StyledTableCell>
-								<StyledTableCell>{distance.distance}</StyledTableCell>
+								<StyledTableCell>{roundNumber(distance.distance, 3)}</StyledTableCell>
+								<StyledTableCell>&#40;{roundVector3(distance.line_segment_points[0], 3).join(", ")}&#41; - &#40;{roundVector3(distance.line_segment_points[1], 3).join(", ")}&#41;</StyledTableCell>
 								<StyledTableCell></StyledTableCell>
 							</TableRow>
 						))}
@@ -145,3 +145,11 @@ export const MeasureResults = () => {
 		</ResultsContainer>
 	);
 };
+
+const roundVector3 = (v: number[], n: number) => {
+	return v.map((e) => e.toFixed(n));
+}
+
+const roundNumber = (n: number, d: number) => {
+	return n.toFixed(d);
+}

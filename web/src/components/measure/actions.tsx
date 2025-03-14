@@ -89,7 +89,7 @@ export function MeasureActions() {
             />
           </PublisherButton>
           <CallEelFunctionButton
-            callback={() => eel.take_snapshot()()}
+            callback={async () => await eel.take_snapshot()()}
             variant="text"
             sx={buttonSx}
           >
@@ -102,7 +102,7 @@ export function MeasureActions() {
             />
           </CallEelFunctionButton>
           <CallEelFunctionButton
-            callback={() => eel.process_pointcloud()()}
+            callback={async () => await eel.process_pointcloud()()}
             variant="text"
             sx={buttonSx}
           >

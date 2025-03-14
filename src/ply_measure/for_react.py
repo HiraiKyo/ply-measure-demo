@@ -40,10 +40,33 @@ pub_image = rospy.Publisher(cfg.ROS_PUB_TOPIC_IMAGE, Image, queue_size=1)
 def take_snapshot():
     global last_points
     filepath = actions_util.open_filebrowser()
+    print(filepath, "test")
+    if filepath == "":
+        return
+
     pcd = o3d.io.read_point_cloud(filepath)
     points = np.asarray(pcd.points)
     last_points = points
     # pub_pointcloud.publish(pc2.numpy_to_pc2(points))
+
+    pcd.paint_uniform_color([0.5, 0.5, 0.5])
+    center = np.mean(points, axis=0)
+    outpath = visualize.capture_image(
+      [pcd],
+      "/root/src/out",
+      "overview.png",
+      cam_front=cfg.CAM_FRONT,
+      cam_lookat=center,
+      cam_up=cfg.CAM_UP,
+      cam_zoom=cfg.CAM_ZOOM
+    )
+
+    # 画像ファイルを読み込んで、ROSMessageに変換してPublish
+    with open(outpath, "rb") as f:
+        img = cv2.imread(outpath)
+        bridge = CvBridge()
+        img_msg = bridge.cv2_to_imgmsg(img, encoding="bgr8")
+        pub_image.publish(img_msg)
 
 @eel.expose
 def process_pointcloud():
@@ -140,4 +163,19 @@ def read_config():
 @eel.expose
 def update_config(json_string: str):
     cfg.update(json_string)
+
+    # src/config/config.json に保存
+    with open("/root/catkin_ws/src/ply-measure-demo/config/config.json", "w") as f:
+        import json
+        parsed = json.loads(json_string)
+        # ルートレベルのみ改行、ネストは1行で出力
+        f.write(json.dumps(parsed,
+            indent=2,
+            ensure_ascii=False))
     return
+
+def load_config():
+    with open("/root/catkin_ws/src/ply-measure-demo/config/config.json", "r") as f:
+        json_string = f.read()
+        cfg.update(json_string)
+    return json_string

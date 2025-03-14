@@ -15,11 +15,13 @@ from eel_ros1.actions_util import *  # noqa: F403
 from eel_ros1.models import rosparam # FIXME: おそらくros_serviceのインポートはここ必須
 from ply_measure.for_react import *  # noqa: F403
 
+load_config()
+
 PACKAGE_NAME = "ply-measure-demo"
 OPTIONS = {
     # "mode": "chrome-app",
     "host": "0.0.0.0",
-    "port": 8000,
+    "port": 22000,
     'cmdline_args': ["--no-sandbox"],
     'size': (800, 600),
     "block": True

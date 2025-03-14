@@ -79,22 +79,9 @@ class Config(ConfigBase):
     def update(self, json_string):
         jsonObject = json.loads(json_string)
         pp.pprint(jsonObject)
-        self.CAM_FRONT = jsonObject["CAM_FRONT"]
-        self.CAM_ZOOM = jsonObject["CAM_ZOOM"]
-        self.CAM_UP = jsonObject["CAM_UP"]
-        self.ROS_SUB_TOPIC = jsonObject["ROS_SUB_TOPIC"]
-        self.ROS_PUB_TOPIC_RESULT = jsonObject["ROS_PUB_TOPIC_RESULT"]
-        self.ROS_PUB_TOPIC_POINTCLOUD = jsonObject["ROS_PUB_TOPIC_POINTCLOUD"]
-        self.ROS_PUB_TOPIC_IMAGE = jsonObject["ROS_PUB_TOPIC_IMAGE"]
-        self.RGB_TABLE = jsonObject["RGB_TABLE"]
-        self.BASE_PLANE_INDEX = jsonObject["BASE_PLANE_INDEX"]
-        self.MIL_PLANE_INDEX = jsonObject["MIL_PLANE_INDEX"]
-        self.CIRCLE_PLANE_INDEX = jsonObject["CIRCLE_PLANE_INDEX"]
-        self.BASE_EXPECTED_EDGES = jsonObject["BASE_EXPECTED_EDGES"]
-        self.MIL_EXPECTED_EDGES = jsonObject["MIL_EXPECTED_EDGES"]
-        self.CONVEX_HULL_EPSILON = jsonObject["CONVEX_HULL_EPSILON"]
-        self.MIN_PLANE_POINTS = jsonObject["MIN_PLANE_POINTS"]
-        self.LOG_LEVEL = jsonObject["LOG_LEVEL"]
-        self.MODE = jsonObject["MODE"]
+
+        for key in jsonObject.keys():
+            if key in self.__dict__.keys():
+                setattr(self, key, jsonObject[key])
 
         print("### Config updated ###")

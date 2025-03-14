@@ -7,20 +7,22 @@ const ROS_EVENTS = (window as any).ROS_EVENTS;
 interface ROSSubscribeImageProps {
   name: string;
   messageType?: string;
-  width?: number;
-  height?: number;
+  maxWidth?: number | string;
+  maxHeight?: number | string;
 }
 
-const ImageContainer = styled(Box)(({ theme }) => ({
-  width: "100%",
-  height: "100%",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  backgroundColor: theme.palette.background.paper,
-  borderRadius: theme.shape.borderRadius,
-  overflow: "hidden",
-}));
+const ImageContainer = styled(Box)<{ maxWidth?: number | string; maxHeight?: number | string }>(
+  ({ theme, maxWidth, maxHeight }) => ({
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: theme.shape.borderRadius,
+    overflow: "hidden",
+    maxWidth: maxWidth || "100%",
+    maxHeight: maxHeight || "100%",
+  })
+);
 
 const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
   "&:hover": {
@@ -38,8 +40,8 @@ const StyledImageListItem = styled(ImageListItem)(({ theme }) => ({
 export const ROSSubscribeImage: React.FC<ROSSubscribeImageProps> = ({
   name,
   messageType = "sensor_msgs.msg.Image",
-  width = 640,
-  height = 480
+  maxWidth,
+  maxHeight,
 }) => {
   const [imageData, setImageData] = useState<string>("");
 
@@ -74,16 +76,12 @@ export const ROSSubscribeImage: React.FC<ROSSubscribeImageProps> = ({
   }, [name, messageType]);
 
   return (
-    <ImageContainer>
-      <StyledImageListItem sx={{ width, height }}>
+    <ImageContainer maxWidth={maxWidth} maxHeight={maxHeight}>
+      <StyledImageListItem>
         <img
           src={imageData || "placeholder.png"}
           alt="ROS Topic"
           loading="lazy"
-          style={{
-            width: "100%",
-            height: "100%",
-          }}
         />
       </StyledImageListItem>
     </ImageContainer>

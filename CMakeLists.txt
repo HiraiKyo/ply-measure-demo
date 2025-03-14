@@ -9,7 +9,6 @@ catkin_python_setup()
 catkin_package()
 
 set(SRC_FILES
-  scripts/main.py
   scripts/react.py
 )
 

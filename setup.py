@@ -9,7 +9,7 @@ setup_args = generate_distutils_setup(
     package_dir={
         '': 'src'
     },
-    scripts=['scripts/main.py', 'scripts/react.py'],
+    scripts=['scripts/react.py'],
 )
 
 setup(**setup_args)

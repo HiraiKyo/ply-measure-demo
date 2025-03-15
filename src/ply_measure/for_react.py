@@ -1,3 +1,7 @@
+import base64
+import json
+import os
+import pprint
 from typing import List, Tuple, Union
 from pydantic import BaseModel
 import open3d as o3d
@@ -14,6 +18,7 @@ from eel_ros1 import actions_util
 
 from .models import measure, gen_points, visualize
 from .utils import config, pc2
+from .utils.settings import Settings
 
 class DistanceSet(BaseModel):
   distance: float
@@ -30,6 +35,7 @@ class MeasureResult(BaseModel):
 
 last_points = None
 cfg = config.Config()
+setting = Settings()
 
 # Publishers
 pub_result = rospy.Publisher(cfg.ROS_PUB_TOPIC_RESULT, String, queue_size=1)
@@ -162,11 +168,12 @@ def read_config():
 
 @eel.expose
 def update_config(json_string: str):
+    global cfg
+    print("#[PLY-MEASURE-DEMO] Updating config")
     cfg.update(json_string)
 
     # src/config/config.json に保存
     with open("/root/catkin_ws/src/ply-measure-demo/config/config.json", "w") as f:
-        import json
         parsed = json.loads(json_string)
         # ルートレベルのみ改行、ネストは1行で出力
         f.write(json.dumps(parsed,
@@ -175,7 +182,69 @@ def update_config(json_string: str):
     return
 
 def load_config():
+    print("#[PLY-MEASURE-DEMO] Loading config")
     with open("/root/catkin_ws/src/ply-measure-demo/config/config.json", "r") as f:
         json_string = f.read()
         cfg.update(json_string)
+    return json_string
+
+@eel.expose
+def browse_file(docker: bool = False):
+    outpath = actions_util.open_filebrowser()
+    if docker == False:
+        return outpath
+
+    # Dockerコンテナ環境下のみ、コンテナのパスをホストのパスに変換
+    if outpath.startswith("/root/src"):
+        outpath = outpath.replace("/root/src/", "")
+        if setting.MODE == "wsl2":
+            outpath = f"file://wsl.localhost/Ubuntu-22.04/home/user/src/{outpath}"
+        elif setting.MODE == "ubuntu":
+            outpath = os.path.expanduser(f"~/src/{outpath}")
+
+    print("#[PLY-MEASURE-DEMO] Browsing file:", outpath)
+    return outpath
+
+@eel.expose
+def load_stl(filepath):
+    with open(filepath, "rb") as f:
+        stl_data = f.read()
+
+    stl_base64 = base64.b64encode(stl_data).decode('utf-8')
+    return {
+        "success": True,
+        "data": stl_base64,
+        "filename": os.path.basename(filepath)
+    }
+
+@eel.expose
+def read_settings():
+    """設定をJSON形式で返す"""
+    global setting
+    print("#[PLY-MEASURE-DEMO] Reading settings")
+    setting.update(load_settings())
+    json = setting.to_json()
+    return json
+
+@eel.expose
+def update_settings(json_string: str):
+    """JSON文字列から設定を更新する"""
+    global setting
+    print("#[PLY-MEASURE-DEMO] Updating settings")
+    setting.update(json_string)
+
+    # src/config/setting.json に保存
+    with open("/root/catkin_ws/src/ply-measure-demo/config/settings.json", "w") as f:
+        parsed = json.loads(json_string)
+        # ルートレベルのみ改行、ネストは1行で出力
+        f.write(json.dumps(parsed,
+            indent=2,
+            ensure_ascii=False))
+    return setting.to_json()
+
+def load_settings():
+    print("#[PLY-MEASURE-DEMO] Loading setttings")
+    with open("/root/catkin_ws/src/ply-measure-demo/config/settings.json", "r") as f:
+        json_string = f.read()
+        setting.update(json_string)
     return json_string

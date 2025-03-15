@@ -9,6 +9,7 @@ import { HomePage } from "./pages/home";
 import { RosTopicsPage } from "./pages/rostopics";
 import { SettingsPage } from "./pages/settings";
 import { ConfigPage } from "./pages/config";
+import { StlViewPage } from "./pages/stlview";
 
 export const eel = (window as any).eel;
 
@@ -24,6 +25,7 @@ function App() {
 						<Route path="/topics" element={<RosTopicsPage />} />
 						<Route path="/config" element={<ConfigPage />} />
 						<Route path="/settings" element={<SettingsPage />} />
+						<Route path="/stlview" element={<StlViewPage />} />
 					</Routes>
 				</Layout>
 			</BrowserRouter>

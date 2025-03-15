@@ -83,5 +83,3 @@ class Config(ConfigBase):
         for key in jsonObject.keys():
             if key in self.__dict__.keys():
                 setattr(self, key, jsonObject[key])
-
-        print("### Config updated ###")

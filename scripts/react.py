@@ -16,6 +16,7 @@ from eel_ros1.models import rosparam # FIXME: おそらくros_serviceのイン�
 from ply_measure.for_react import *  # noqa: F403
 
 load_config()
+load_settings()
 
 PACKAGE_NAME = "ply-measure-demo"
 OPTIONS = {
